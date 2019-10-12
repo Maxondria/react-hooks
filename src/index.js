@@ -8,8 +8,11 @@ const NotesApp = () => {
 
   useEffect(() => {
     console.log("ComponentDidMount");
-    const defaultNotes = JSON.parse(localStorage.getItem("notes")) || [];
-    setNotes(defaultNotes);
+    const defaultNotes = JSON.parse(localStorage.getItem("notes"));
+
+    if (Array.isArray(defaultNotes) && defaultNotes.length > 0) {
+      setNotes(defaultNotes);
+    }
   }, []);
 
   useEffect(() => {
@@ -36,10 +39,7 @@ const NotesApp = () => {
       <h1>Notes</h1>
       <p>Add Note</p>
       {notes.map(note => (
-        <div key={note.title}>
-          <h3>{note.title}</h3>
-          <button onClick={() => onRemove(note.title)}>Remove</button>
-        </div>
+        <Note key={note.title} note={note} onRemove={onRemove} />
       ))}
       <form onSubmit={addNote}>
         <input
@@ -53,45 +53,62 @@ const NotesApp = () => {
   );
 };
 
-const App = props => {
-  const [count, setCount] = useState(props.count);
-  const [title, setTitle] = useState("count");
-  const [prevCount, setPrevCount] = useState(count);
-
+const Note = ({ note, onRemove }) => {
   useEffect(() => {
-    console.log("Running as ComponentDidMount");
+    console.log("Setting Up Effect");
+
+    return () => {
+      //runs before component is taken out DOM
+      console.log("ComponentDidUnmount");
+    };
   }, []);
-
-  useEffect(() => {
-    console.log("Running as ComponentDidUpdate");
-    document.title = count;
-  }, [count]);
-
   return (
     <div>
-      The calculated {title} is: {prevCount} + {count === 0 ? "0" : "1"} ={" "}
-      {count}
-      <br />
-      <input
-        type="text"
-        value={title}
-        onChange={e => setTitle(e.target.value)}
-      />
-      <button
-        onClick={() => {
-          setPrevCount(count);
-          setCount(count + 1);
-        }}
-      >
-        +1
-      </button>
+      <h3>{note.title}</h3>
+      <button onClick={() => onRemove(note.title)}>Remove</button>
     </div>
   );
 };
 
-App.defaultProps = {
-  count: 0
-};
+// const App = props => {
+//   const [count, setCount] = useState(props.count);
+//   const [title, setTitle] = useState("count");
+//   const [prevCount, setPrevCount] = useState(count);
+//
+//   useEffect(() => {
+//     console.log("Running as ComponentDidMount");
+//   }, []);
+//
+//   useEffect(() => {
+//     console.log("Running as ComponentDidUpdate");
+//     document.title = count;
+//   }, [count]);
+//
+//   return (
+//     <div>
+//       The calculated {title} is: {prevCount} + {count === 0 ? "0" : "1"} ={" "}
+//       {count}
+//       <br />
+//       <input
+//         type="text"
+//         value={title}
+//         onChange={e => setTitle(e.target.value)}
+//       />
+//       <button
+//         onClick={() => {
+//           setPrevCount(count);
+//           setCount(count + 1);
+//         }}
+//       >
+//         +1
+//       </button>
+//     </div>
+//   );
+// };
+//
+// App.defaultProps = {
+//   count: 0
+// };
 
 ReactDOM.render(<NotesApp />, document.getElementById("root"));
 
