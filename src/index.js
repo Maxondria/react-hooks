@@ -3,13 +3,19 @@ import ReactDOM from "react-dom";
 import * as serviceWorker from "./serviceWorker";
 
 const NotesApp = () => {
-  const defaultNotes = JSON.parse(localStorage.getItem("notes"));
-  const [notes, setNotes] = useState(defaultNotes || []);
+  const [notes, setNotes] = useState([]);
   const [title, setTitle] = useState("");
 
   useEffect(() => {
+    console.log("ComponentDidMount");
+    const defaultNotes = JSON.parse(localStorage.getItem("notes")) || [];
+    setNotes(defaultNotes);
+  }, []);
+
+  useEffect(() => {
+    console.log("ComponentDidUpdate");
     localStorage.setItem("notes", JSON.stringify(notes));
-  });
+  }, [notes]);
 
   const addNote = e => {
     e.preventDefault();
@@ -47,24 +53,45 @@ const NotesApp = () => {
   );
 };
 
-// const App = props => {
-//   const [count, setCount] = useState(props.count);
-//
-//   useEffect(() => {
-//     console.log("Running...");
-//   });
-//
-//   return (
-//     <div>
-//       The count is at: {count}
-//       <button onClick={() => setCount(count + 1)}>+1</button>
-//     </div>
-//   );
-// };
-//
-// App.defaultProps = {
-//   count: 0
-// };
+const App = props => {
+  const [count, setCount] = useState(props.count);
+  const [title, setTitle] = useState("count");
+  const [prevCount, setPrevCount] = useState(count);
+
+  useEffect(() => {
+    console.log("Running as ComponentDidMount");
+  }, []);
+
+  useEffect(() => {
+    console.log("Running as ComponentDidUpdate");
+    document.title = count;
+  }, [count]);
+
+  return (
+    <div>
+      The calculated {title} is: {prevCount} + {count === 0 ? "0" : "1"} ={" "}
+      {count}
+      <br />
+      <input
+        type="text"
+        value={title}
+        onChange={e => setTitle(e.target.value)}
+      />
+      <button
+        onClick={() => {
+          setPrevCount(count);
+          setCount(count + 1);
+        }}
+      >
+        +1
+      </button>
+    </div>
+  );
+};
+
+App.defaultProps = {
+  count: 0
+};
 
 ReactDOM.render(<NotesApp />, document.getElementById("root"));
 
