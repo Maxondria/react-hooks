@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext } from "react";
 import NotesContext from "../context/notes.context";
 import useMousePosition from "../custom-hooks/mousemovent.hook";
 
