@@ -1,17 +1,30 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useReducer } from "react";
 import ReactDOM from "react-dom";
 import * as serviceWorker from "./serviceWorker";
 
+const notesReducer = (state, action) => {
+  switch (action.type) {
+    case "POPULATE_NOTES":
+      return action.notes;
+    case "ADD_NOTE":
+      return [...state, { title: action.title }];
+    case "REMOVE_NOTE":
+      return state.filter(note => note.title !== action.title);
+    default:
+      return state;
+  }
+};
+
 const NotesApp = () => {
-  const [notes, setNotes] = useState([]);
+  const [notes, dispatch] = useReducer(notesReducer, []);
   const [title, setTitle] = useState("");
 
   useEffect(() => {
     console.log("ComponentDidMount");
-    const defaultNotes = JSON.parse(localStorage.getItem("notes"));
+    const notes = JSON.parse(localStorage.getItem("notes"));
 
-    if (Array.isArray(defaultNotes) && defaultNotes.length > 0) {
-      setNotes(defaultNotes);
+    if (Array.isArray(notes) && notes.length > 0) {
+      dispatch({ type: "POPULATE_NOTES", notes });
     }
   }, []);
 
@@ -22,16 +35,12 @@ const NotesApp = () => {
 
   const addNote = e => {
     e.preventDefault();
-    setNotes([...notes, { title }]);
+    dispatch({ type: "ADD_NOTE", title });
     setTitle("");
   };
 
   const onRemove = title => {
-    setNotes(
-      notes.filter(note => {
-        return note.title !== title;
-      })
-    );
+    dispatch({ type: "REMOVE_NOTE", title });
   };
 
   return (
@@ -70,49 +79,5 @@ const Note = ({ note, onRemove }) => {
   );
 };
 
-// const App = props => {
-//   const [count, setCount] = useState(props.count);
-//   const [title, setTitle] = useState("count");
-//   const [prevCount, setPrevCount] = useState(count);
-//
-//   useEffect(() => {
-//     console.log("Running as ComponentDidMount");
-//   }, []);
-//
-//   useEffect(() => {
-//     console.log("Running as ComponentDidUpdate");
-//     document.title = count;
-//   }, [count]);
-//
-//   return (
-//     <div>
-//       The calculated {title} is: {prevCount} + {count === 0 ? "0" : "1"} ={" "}
-//       {count}
-//       <br />
-//       <input
-//         type="text"
-//         value={title}
-//         onChange={e => setTitle(e.target.value)}
-//       />
-//       <button
-//         onClick={() => {
-//           setPrevCount(count);
-//           setCount(count + 1);
-//         }}
-//       >
-//         +1
-//       </button>
-//     </div>
-//   );
-// };
-//
-// App.defaultProps = {
-//   count: 0
-// };
-
 ReactDOM.render(<NotesApp />, document.getElementById("root"));
-
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
 serviceWorker.unregister();
