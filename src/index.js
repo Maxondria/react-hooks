@@ -1,10 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import * as serviceWorker from "./serviceWorker";
 
 const NotesApp = () => {
-  const [notes, setNotes] = useState([]);
+  const defaultNotes = JSON.parse(localStorage.getItem("notes"));
+  const [notes, setNotes] = useState(defaultNotes || []);
   const [title, setTitle] = useState("");
+
+  useEffect(() => {
+    localStorage.setItem("notes", JSON.stringify(notes));
+  });
 
   const addNote = e => {
     e.preventDefault();
@@ -41,6 +46,25 @@ const NotesApp = () => {
     </div>
   );
 };
+
+// const App = props => {
+//   const [count, setCount] = useState(props.count);
+//
+//   useEffect(() => {
+//     console.log("Running...");
+//   });
+//
+//   return (
+//     <div>
+//       The count is at: {count}
+//       <button onClick={() => setCount(count + 1)}>+1</button>
+//     </div>
+//   );
+// };
+//
+// App.defaultProps = {
+//   count: 0
+// };
 
 ReactDOM.render(<NotesApp />, document.getElementById("root"));
 
